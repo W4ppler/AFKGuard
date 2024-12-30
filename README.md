@@ -43,7 +43,3 @@ and click at regular intervals.
 - pyautogui
 - pydirectinput
 - pynput
-
-## License
-
-This project is licensed under the MIT License.
