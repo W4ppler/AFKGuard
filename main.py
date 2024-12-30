@@ -81,7 +81,6 @@ class MyWindow(QWidget):
         self.listener = keyboard.Listener(on_press=self.keyPressed)
         self.listener.start()
 
-
     def keyPressed(self, key):
         try:
             if key == keyboard.Key.f6:

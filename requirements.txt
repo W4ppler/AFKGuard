@@ -1,0 +1,4 @@
+pyautogui
+pydirectinput
+PyQt5
+pynput
