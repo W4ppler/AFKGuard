@@ -5,9 +5,10 @@ and click at regular intervals.
 
 ## Features
 
+- **FAILSAFE MECHANISM** Moving the cursor to the top left corner causes the program to crash
 - **Move Mouse:** Moves the mouse back and forth until stopped.
-- **Press Keys:** Randomly presses the 'W', 'A', 'S', and 'D' keys until stopped.
-- **Click:** Simulates mouse clicks at a specified interval until stopped.
+- **Press Keys:** Randomly presses the specified keys (standard is W,A,S,D) until stopped.
+- **Click:** Simulates mouse clicks at a specified speed until stopped.
 - **Stop Actions:** Stops all ongoing actions with a button click or by pressing the F6 key.
 
 ## Installation

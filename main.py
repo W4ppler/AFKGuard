@@ -4,9 +4,9 @@ import sys
 import pyautogui
 import pydirectinput
 import time
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QGridLayout, QFrame, QLineEdit, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QSystemTrayIcon, QMenu, QGridLayout, QFrame, QLineEdit, QLabel, QAction
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QIcon
 from pynput import keyboard
 
 
@@ -20,14 +20,23 @@ class MyWindow(QWidget):
         # Sets the window to always be in front
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
+
+        self.setAttribute(Qt.WA_QuitOnClose, False)
+        self.create_tray_icon()
+
+
+        self.setAttribute(Qt.WA_QuitOnClose, False)
+        self.create_tray_icon()
+        self.hide()
+
         # Create a QVBoxLayout to arrange buttons vertically
         self.layout = QGridLayout()
 
         # Create buttons
-        self.buttonMoveMouse = QPushButton("Move Mouse until stopped", self)
-        self.buttonPressKeys = QPushButton("Press Keys until stopped", self)
-        self.buttonClick = QPushButton("Click until stopped", self)
-        self.buttonStop = QPushButton("stop (F6)", self)
+        self.buttonMoveMouse = QPushButton("Move Mouse until stopped (F5)", self)
+        self.buttonPressKeys = QPushButton("Press Keys until stopped (F6)", self)
+        self.buttonClick = QPushButton("Click until stopped (F7)", self)
+        self.buttonStop = QPushButton("stop (F8)", self)
 
         # Create the input fields
         self.inputMoveMouse = QLineEdit(self)
@@ -86,14 +95,29 @@ class MyWindow(QWidget):
         self.listener = keyboard.Listener(on_press=self.keyPressed)
         self.listener.start()
 
-    def keyPressed(self, key):
-        try:
-            if key == keyboard.Key.f6:
-                self.buttonStop.animateClick()
-                self.stop()
-        except AttributeError:
-            pass
+    def create_tray_icon(self):
+        icon = QIcon("icon.png")  # Load your PNG icon
+        self.tray_icon = QSystemTrayIcon(icon, self)
+        self.tray_icon.show()
 
+
+    def closeEvent(self, event):
+        # Hide the window instead of closing it
+        self.hide()
+
+    def keyPressed(self, key):
+        if key == keyboard.Key.f5:
+            self.buttonMoveMouse.animateClick()
+            self.buttonMoveMouse.click()
+        if key == keyboard.Key.f6:
+            self.buttonPressKeys.animateClick()
+            self.buttonPressKeys.click()
+        if key == keyboard.Key.f7:
+            self.buttonClick.animateClick()
+            self.buttonClick.click()
+        if key == keyboard.Key.f8:
+            self.buttonStop.animateClick()
+            self.buttonStop.click()
 
     def startMovingMouse(self):
         self.stopped = False
@@ -108,26 +132,35 @@ class MyWindow(QWidget):
 
         print(f"Moving mouse with scale: {scale}")
 
-        if scale==1:
-            self.timerMoveMouse.start(250)
-
+        self.timerMoveMouse.start(int(100/scale))
 
     def moveMouse(self):
         if self.stopped:
             self.timerMoveMouse.stop()
-        else:
-            # Get scale value from input field for mouse movement
-            scale = self.inputMoveMouse.text()
-            try:
-                scale = int(scale)
-                if scale<0:
-                    raise ValueError()
-            except ValueError:
-                scale = 1  # default scale value
+            return
 
-            pydirectinput.moveRel(scale,0)
-            pydirectinput.moveRel(-scale,0)
+        scale = self.inputMoveMouse.text()
+        try:
+            scale = int(scale)
+            if scale < 0:
+                raise ValueError()
+        except ValueError:
+            scale = 1
 
+        scale += 50
+
+        x = random.randint(-10 * scale, 10 * scale)
+        y = random.randint(-10 * scale, 10 * scale)
+
+        num_steps = 10
+        for i in range(num_steps):
+            x = x * (i + 1) / num_steps
+            y = y * (i + 1) / num_steps
+            pydirectinput.moveRel(int(x), int(y))
+            time.sleep(0.01)  # Small delay for smoothness
+
+        # Ensure the mouse doesn't get stuck in a corner by making small random movements
+        pydirectinput.moveRel(random.randint(-1, 1), random.randint(-1, 1))
                     
 
     def startPressingKeys(self):
