@@ -21,13 +21,13 @@ class MyWindow(QWidget):
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
 
-        self.setAttribute(Qt.WA_QuitOnClose, False)
-        self.create_tray_icon()
+        #self.setAttribute(Qt.WA_QuitOnClose, False)
+        #self.create_tray_icon()
 
 
-        self.setAttribute(Qt.WA_QuitOnClose, False)
-        self.create_tray_icon()
-        self.hide()
+        #self.setAttribute(Qt.WA_QuitOnClose, False)
+        #self.create_tray_icon()
+        #self.hide()
 
         # Create a QVBoxLayout to arrange buttons vertically
         self.layout = QGridLayout()
