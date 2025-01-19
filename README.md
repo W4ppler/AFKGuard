@@ -1,7 +1,8 @@
 # AFKGuard
 
-AFKGuard is designed to prevent you from going idle by simulating user activity. It can move the mouse, press keys, 
-and click at regular intervals.
+I have created AFKGuard, because I have searched for such a program a long time now. I have often found some programs but 
+they never seemed work with games, because they would always use high level APIs (that's the reason why I use pydirectinput 
+instead of pyautogui, which would be much easier to implement).
 
 ## Features
 
@@ -10,6 +11,7 @@ and click at regular intervals.
 - **Press Keys:** Randomly presses the specified keys (standard is W,A,S,D) until stopped.
 - **Click:** Simulates mouse clicks at a specified speed until stopped.
 - **Stop Actions:** Stops all ongoing actions with a button click or by pressing the F6 key.
+- **(NEW) Duration:** You can now set the duration of the guarding
 
 ## Installation
 
@@ -17,11 +19,6 @@ and click at regular intervals.
     ```bash
     git clone https://github.com/W4ppler/AFKGuard.git
     cd afkguard
-    ```
-
-2. **Install the required packages:**
-    ```bash
-    pip install -r requirements.txt
     ```
 
 ## Usage
@@ -34,7 +31,7 @@ and click at regular intervals.
 2. **Using the application:**
     - **Move Mouse:** Enter the scale value (default is 1) and click the "Move Mouse until stopped" button.
     - **Press Keys:** Click the "Press Keys until stopped" button to start pressing w,a,s and d.
-    - **Click:** Enter the speed value (default is 1 click per second) and click the "Click until stopped" button.
+    - **Click:** Enter the speed value (default is 1 click per second) and click the "Click" button.
     - **Stop Actions:** Click the "stop" button or press the F6 key to stop all actions.
 
 ## Dependencies
