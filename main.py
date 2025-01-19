@@ -15,69 +15,97 @@ class MyWindow(QWidget):
         super().__init__()
 
         self.setWindowTitle("AFKGuard")
-        self.setGeometry(100, 100, 350, 200)
+        self.setGeometry(100, 100, 380, 160)
 
         # Sets the window to always be in front
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
-
+        # The program cannot be fully closed with the X, but with the tray menu
         #self.setAttribute(Qt.WA_QuitOnClose, False)
         #self.create_tray_icon()
-
-
-        #self.setAttribute(Qt.WA_QuitOnClose, False)
-        #self.create_tray_icon()
-        #self.hide()
 
         # Create a QVBoxLayout to arrange buttons vertically
         self.layout = QGridLayout()
 
-        # Create buttons
-        self.buttonMoveMouse = QPushButton("Move Mouse until stopped (F5)", self)
-        self.buttonPressKeys = QPushButton("Press Keys until stopped (F6)", self)
-        self.buttonClick = QPushButton("Click until stopped (F7)", self)
-        self.buttonStop = QPushButton("stop (F8)", self)
 
-        # Create the input fields
+        # Move Mouse - Button
+        self.buttonMoveMouse = QPushButton("Move Mouse (F5)", self)
+        self.buttonMoveMouse.clicked.connect(self.startMovingMouse)
+        # Move Mouse - Input
         self.inputMoveMouse = QLineEdit(self)
         self.inputMoveMouse.setPlaceholderText("1")
-        self.inputPressKeys = QLineEdit(self)
-        self.inputPressKeys.setPlaceholderText("w;a;s;d")
-        self.inputClick = QLineEdit(self)
-        self.inputClick.setPlaceholderText("1")
-
-        # Create labels
-        self.labelMoveMouse = QLabel("    Scale: ", self)
-        self.labelClick = QLabel("    Clicks/s: ", self)
-        self.labelPressKeys = QLabel("    Keys: ", self)
-
-        # Create seperator line
-        self.h_line = QFrame()
-        self.h_line.setFrameShape(QFrame.HLine)
-
-        # Add Widgets to the layout
+        # Move Mouse - Labels
+        self.labelMoveMouse = QLabel("Scale: ", self)
+        # Adding them to the layout
         self.layout.addWidget(self.buttonMoveMouse, 0, 0)
         self.layout.addWidget(self.labelMoveMouse, 0, 1)
-        self.layout.addWidget(self.inputMoveMouse, 0, 2)
+        self.layout.addWidget(self.inputMoveMouse, 0, 2, 1, 3)
+
+
+        # Press Keys - Button
+        self.buttonPressKeys = QPushButton("Press Keys (F6)", self)
+        self.buttonPressKeys.clicked.connect(self.startPressingKeys)
+        # Press Keys - Input
+        self.inputPressKeys = QLineEdit(self)
+        self.inputPressKeys.setPlaceholderText("w;a;s;d")
+        # Press Keys - Labels
+        self.labelPressKeys = QLabel("Keys: ", self)
+        # Adding them to the layout
         self.layout.addWidget(self.buttonPressKeys, 1, 0)
         self.layout.addWidget(self.labelPressKeys, 1, 1)
-        self.layout.addWidget(self.inputPressKeys, 1, 2)
+        self.layout.addWidget(self.inputPressKeys, 1, 2, 1, 3)
+
+
+        # Click - Button
+        self.buttonClick = QPushButton("Click (F7)", self)
+        self.buttonClick.clicked.connect(self.startClicking)
+        # Click - Input
+        self.inputClick = QLineEdit(self)
+        self.inputClick.setPlaceholderText("1")
+        # Click - Labels
+        self.labelClick = QLabel("Clicks/s: ", self)
+        # Adding them to the layout
         self.layout.addWidget(self.buttonClick, 3, 0)
         self.layout.addWidget(self.labelClick, 3, 1)
-        self.layout.addWidget(self.inputClick, 3, 2)
-        self.layout.addWidget(self.h_line, 4, 0, 1, 5)
+        self.layout.addWidget(self.inputClick, 3, 2, 1, 3)
+
+
+        # Stop Button
+        self.buttonStop = QPushButton("stop (F8)", self)
+        self.buttonStop.clicked.connect(self.stop)
+        # Adding it to the layout
         self.layout.addWidget(self.buttonStop, 5, 0)
 
-        # Connect buttons to their respective slots
-        self.buttonMoveMouse.clicked.connect(self.startMovingMouse)
-        self.buttonPressKeys.clicked.connect(self.startPressingKeys)
-        self.buttonClick.clicked.connect(self.startClicking)
-        self.buttonStop.clicked.connect(self.stop)
+
+        # Duration Label
+        self.labelDuration = QLabel("Duration: ", self)
+        self.labelDurationHint = QLabel("(empty => until stopped)", self)
+        # Duration input
+        self.inputDurationHours = QLineEdit(self)
+        self.inputDurationHours.setPlaceholderText("Hours")
+        self.labelDurationMinutes = QLineEdit(self)
+        self.labelDurationMinutes.setPlaceholderText("Minutes")
+        self.labelDurationSeconds = QLineEdit(self)
+        self.labelDurationSeconds.setPlaceholderText("Seconds")
+        # Adding to layout
+        self.layout.addWidget(self.labelDuration, 5, 1)
+        self.layout.addWidget(self.labelDurationHint, 6, 2, 1, 3)
+        self.layout.addWidget(self.inputDurationHours, 5, 2)
+        self.layout.addWidget(self.labelDurationMinutes, 5, 3)
+        self.layout.addWidget(self.labelDurationSeconds, 5, 4)
+
+
+        # Seperator line
+        self.h_line = QFrame()
+        self.h_line.setFrameShape(QFrame.HLine)
+        # Adding to the layout
+        self.layout.addWidget(self.h_line, 4, 0, 1, 5)
+
 
         # Set the layout for the window
         self.setLayout(self.layout)
 
-        # Initialize stopped flag and timers
+        # Initialize stop flag and timers
         self.stopped = False
         self.timerMoveMouse = QTimer(self)
         self.timerMoveMouse.timeout.connect(self.moveMouse)
@@ -87,6 +115,9 @@ class MyWindow(QWidget):
 
         self.timerClick = QTimer(self)
         self.timerClick.timeout.connect(self.click)
+
+        self.timerStop = QTimer(self)
+        self.timerStop.timeout.connect(self.stop)
 
         # Screen size
         self.width, self.height = pyautogui.size()
@@ -100,10 +131,6 @@ class MyWindow(QWidget):
         self.tray_icon = QSystemTrayIcon(icon, self)
         self.tray_icon.show()
 
-
-    def closeEvent(self, event):
-        # Hide the window instead of closing it
-        self.hide()
 
     def keyPressed(self, key):
         if key == keyboard.Key.f5:
@@ -129,6 +156,37 @@ class MyWindow(QWidget):
         except ValueError:
             print("Invalid scale value, using default (1)")
             scale = 1
+
+        if self.timerMoveMouse.isActive():
+            print(f"Timer already running, not setting a new one")
+        else:
+            durationHours = self.inputDurationHours.text()
+            durationMinutes = self.labelDurationMinutes.text()
+            durationSeconds = self.labelDurationSeconds.text()
+
+            try:
+                durationHours = int(durationHours)
+            except ValueError:
+                durationHours = 0
+
+            try:
+                durationMinutes = int(durationMinutes)
+            except ValueError:
+                durationMinutes = 0
+
+            try:
+                durationSeconds = int(durationSeconds)
+            except ValueError:
+                durationSeconds = 0
+
+
+            if(durationHours == 0 and durationMinutes == 0 and durationSeconds == 0):
+                print("Duration: until stopped")
+            else:
+                duration = durationHours * 3600 + durationMinutes * 60 + durationSeconds
+                duration *= 1000
+                print(f"Duration: {durationHours} hour(s) {durationMinutes} minute(s) {durationSeconds} second(s) (={duration}ms)")
+                self.timerStop.start(duration)
 
         print(f"Moving mouse with scale: {scale}")
 
@@ -156,8 +214,16 @@ class MyWindow(QWidget):
         for i in range(num_steps):
             x = x * (i + 1) / num_steps
             y = y * (i + 1) / num_steps
+
+            current_x, current_y = pyautogui.position()
+            target_x = current_x + x
+            target_y = current_y + y
+
+            if target_x < 10 or target_y < 10:
+                pydirectinput.move(int(self.width/2), int(self.height/2))
+
             pydirectinput.moveRel(int(x), int(y))
-            time.sleep(0.01)  # Small delay for smoothness
+
 
         # Ensure the mouse doesn't get stuck in a corner by making small random movements
         pydirectinput.moveRel(random.randint(-1, 1), random.randint(-1, 1))
@@ -165,6 +231,37 @@ class MyWindow(QWidget):
 
     def startPressingKeys(self):
         self.stopped = False
+
+        if self.timerMoveMouse.isActive():
+            print(f"Timer already running, not setting a new one")
+        else:
+            durationHours = self.inputDurationHours.text()
+            durationMinutes = self.labelDurationMinutes.text()
+            durationSeconds = self.labelDurationSeconds.text()
+
+            try:
+                durationHours = int(durationHours)
+            except ValueError:
+                durationHours = 0
+
+            try:
+                durationMinutes = int(durationMinutes)
+            except ValueError:
+                durationMinutes = 0
+
+            try:
+                durationSeconds = int(durationSeconds)
+            except ValueError:
+                durationSeconds = 0
+
+            if (durationHours == 0 and durationMinutes == 0 and durationSeconds == 0):
+                print("Duration: until stopped")
+            else:
+                duration = durationHours * 3600 + durationMinutes * 60 + durationSeconds
+                duration *= 1000
+                print(
+                    f"Duration: {durationHours} hour(s) {durationMinutes} minute(s) {durationSeconds} second(s) (={duration}ms)")
+                self.timerStop.start(duration)
 
         # Get Keys value from input field
         keyString = self.inputPressKeys.text()
@@ -199,6 +296,37 @@ class MyWindow(QWidget):
     def startClicking(self):
         self.stopped = False
 
+        if self.timerMoveMouse.isActive():
+            print(f"Timer already running, not setting a new one")
+        else:
+            durationHours = self.inputDurationHours.text()
+            durationMinutes = self.labelDurationMinutes.text()
+            durationSeconds = self.labelDurationSeconds.text()
+
+            try:
+                durationHours = int(durationHours)
+            except ValueError:
+                durationHours = 0
+
+            try:
+                durationMinutes = int(durationMinutes)
+            except ValueError:
+                durationMinutes = 0
+
+            try:
+                durationSeconds = int(durationSeconds)
+            except ValueError:
+                durationSeconds = 0
+
+            if (durationHours == 0 and durationMinutes == 0 and durationSeconds == 0):
+                print("Duration: until stopped")
+            else:
+                duration = durationHours * 3600 + durationMinutes * 60 + durationSeconds
+                duration *= 1000
+                print(
+                    f"Duration: {durationHours} hour(s) {durationMinutes} minute(s) {durationSeconds} second(s) (={duration}ms)")
+                self.timerStop.start(duration)
+
         # Get clicks value from input field
         clicks = self.inputClick.text()
         try:
@@ -224,6 +352,7 @@ class MyWindow(QWidget):
     def stop(self):
         print("Stopping actions.")
         self.stopped = True
+        self.timerStop.stop()
 
 # Create the application object
 app = QApplication(sys.argv)
