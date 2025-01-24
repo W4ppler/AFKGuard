@@ -4,6 +4,9 @@ I have created AFKGuard, because I have searched for such a program a long time 
 they never seemed work with games, because they would always use high level APIs (that's the reason why I use pydirectinput 
 instead of pyautogui, which would be much easier to implement).
 
+## Requirements
+This program is designed for Windows operating systems only.
+
 ## Features
 
 - **FAILSAFE MECHANISM** Moving the cursor to the top left corner causes the program to crash
@@ -33,8 +36,7 @@ instead of pyautogui, which would be much easier to implement).
     - **Press Keys:** Click the "Press Keys until stopped" button to start pressing w,a,s and d.
     - **Click:** Enter the speed value (default is 1 click per second) and click the "Click" button.
     - **Stop Actions:** Click the "stop" button or press the F6 key to stop all actions.
-  
-3. **Attention** this program only works on windows! 
+
 
 ## Dependencies
 
