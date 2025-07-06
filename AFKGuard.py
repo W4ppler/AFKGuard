@@ -225,8 +225,10 @@ class MyWindow(QWidget):
             pydirectinput.moveRel(int(x), int(y))
 
 
+
         # Ensure the mouse doesn't get stuck in a corner by making small random movements
         pydirectinput.moveRel(random.randint(-1, 1), random.randint(-1, 1))
+        pydirectinput.moveTo(1000, 500)
                     
 
     def startPressingKeys(self):
